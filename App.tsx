@@ -10,22 +10,18 @@ import {
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Sound from 'react-native-sound'; // optional
 
 const { width } = Dimensions.get('window');
 
 const CalculatorApp: React.FC = () => {
-  // State definitions with types
   const [expression, setExpression] = useState<string>('');
   const [result, setResult] = useState<string>('0');
   const [history, setHistory] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState<boolean>(false);
 
-  // Animation values (useRef ensures values are stable)
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(300)).current;
 
-  // Load history and start animations on mount
   useEffect(() => {
     loadHistory();
 
@@ -43,7 +39,6 @@ const CalculatorApp: React.FC = () => {
     ]).start();
   }, []);
 
-  /** Load calculation history */
   const loadHistory = async (): Promise<void> => {
     try {
       const historyData = await AsyncStorage.getItem('calculatorHistory');
@@ -55,7 +50,6 @@ const CalculatorApp: React.FC = () => {
     }
   };
 
-  /** Save calculation */
   const saveToHistory = async (calc: string): Promise<void> => {
     try {
       const newHistory = [calc, ...history.slice(0, 4)];
@@ -66,22 +60,12 @@ const CalculatorApp: React.FC = () => {
     }
   };
 
-  /** Click sound (optional) */
-  const playClickSound = (): void => {
-    // clickSound.play();
-  };
-
-  /** Handle number input */
   const handleNumberPress = (num: string): void => {
-    playClickSound();
     setExpression((prev) => prev + num);
   };
 
-  /** Handle operator press */
   const handleOperatorPress = (operator: string): void => {
-    playClickSound();
     if (expression === '' && operator !== '-') return;
-
     const lastChar = expression.slice(-1);
     if (['+', '-', '*', '/'].includes(lastChar)) {
       setExpression((prev) => prev.slice(0, -1) + operator);
@@ -90,9 +74,7 @@ const CalculatorApp: React.FC = () => {
     }
   };
 
-  /** Advanced operations */
   const handleAdvancedOperation = (operation: string): void => {
-    playClickSound();
     let calculation = '';
     let resultValue = '';
 
@@ -110,7 +92,6 @@ const CalculatorApp: React.FC = () => {
           resultValue = (eval(expression) / 100).toString();
           calculation = `(${expression})% = ${resultValue}`;
           break;
-       
       }
 
       if (calculation) {
@@ -123,11 +104,8 @@ const CalculatorApp: React.FC = () => {
     }
   };
 
-  /** Calculate expression result */
   const calculateResult = (): void => {
-    playClickSound();
     if (!expression) return;
-
     try {
       const sanitizedExpression = expression.replace(/[^0-9+\-*/().]/g, '');
       const calculationResult = eval(sanitizedExpression).toString();
@@ -140,28 +118,20 @@ const CalculatorApp: React.FC = () => {
     }
   };
 
-  /** Clear calculator */
   const clearCalculator = (): void => {
-    playClickSound();
     setExpression('');
     setResult('0');
   };
 
-  /** Delete last character */
   const handleDelete = (): void => {
-    playClickSound();
     setExpression((prev) => prev.slice(0, -1));
   };
 
-  /** Toggle history */
   const toggleHistory = (): void => {
-    playClickSound();
     setShowHistory((prev) => !prev);
   };
 
-  /** Clear history */
   const clearHistory = async (): Promise<void> => {
-    playClickSound();
     try {
       await AsyncStorage.removeItem('calculatorHistory');
       setHistory([]);
@@ -178,7 +148,6 @@ const CalculatorApp: React.FC = () => {
         { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
       ]}
     >
-      {/* Display */}
       <View style={styles.displayContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <Text style={styles.expressionText}>{expression || '0'}</Text>
@@ -186,14 +155,12 @@ const CalculatorApp: React.FC = () => {
         <Text style={styles.resultText}>{result}</Text>
       </View>
 
-      {/* Toggle History Button */}
       <TouchableOpacity style={styles.historyButton} onPress={toggleHistory}>
         <Text style={styles.historyButtonText}>
           {showHistory ? '📟 Calculator' : '📊 History'}
         </Text>
       </TouchableOpacity>
 
-      {/* Conditional Views */}
       {showHistory ? (
         <View style={styles.historyContainer}>
           <Text style={styles.historyTitle}>Calculation History</Text>
@@ -214,15 +181,13 @@ const CalculatorApp: React.FC = () => {
         </View>
       ) : (
         <View style={styles.buttonsContainer}>
-          {/* Buttons grid */}
           {[
             ['⌫'],
-            ['C','√', '%', '÷'],
+            ['C', '√', '%', '÷'],
             ['7', '8', '9', '×'],
             ['4', '5', '6', '-'],
             ['1', '2', '3', '+'],
-            ['x²', '0','.', '='],
-            
+            ['x²', '0', '.', '='],
           ].map((row, rowIndex) => (
             <View key={rowIndex} style={styles.row}>
               {row.map((btn) => (
